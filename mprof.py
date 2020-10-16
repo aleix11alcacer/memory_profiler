@@ -213,6 +213,7 @@ def run_action():
                         help="""File to store results in, defaults to 'mprofile_<YYYYMMDDhhmmss>.dat' in the current directory,
 (where <YYYYMMDDhhmmss> is the date-time of the program start).
 This file contains the process memory consumption, in Mb (one value per line).""")
+    parser.add_argument("--label", dest="label")
     parser.add_argument("program", nargs=REMAINDER,
                         help='Option 1: "<EXECUTABLE> <ARG1> <ARG2>..." - profile executable\n'
                              'Option 2: "<PYTHON_SCRIPT> <ARG1> <ARG2>..." - profile python script\n'
@@ -276,6 +277,7 @@ This file contains the process memory consumption, in Mb (one value per line).""
 
     with open(mprofile_output, "a") as f:
         f.write("CMDLINE {0}\n".format(cmd_line))
+        f.write("LABEL {0}\n".format(args.label))
         mp.memory_usage(proc=p, interval=args.interval, timeout=args.timeout, timestamps=True,
                         include_children=args.include_children,
                         multiprocess=args.multiprocess, stream=f)
@@ -351,8 +353,9 @@ def read_mprofile_file(filename):
     func_ts = {}
     mem_usage = []
     timestamp = []
-    children  = defaultdict(list)
+    children = defaultdict(list)
     cmd_line = None
+    label = None
     f = open(filename, "r")
     for l in f:
         if l == '\n':
@@ -385,13 +388,15 @@ def read_mprofile_file(filename):
 
         elif field == "CMDLINE":
             cmd_line = value
+        elif field == "LABEL":
+            label = value[:-1]
         else:
             pass
     f.close()
 
     return {"mem_usage": mem_usage, "timestamp": timestamp,
             "func_timestamp": func_ts, 'filename': filename,
-            'cmd_line': cmd_line, 'children': children}
+            'cmd_line': cmd_line, 'children': children, 'label': label}
 
 
 def plot_file(filename, index=0, timestamps=True, children=True, options=None):
@@ -441,10 +446,11 @@ def plot_file(filename, index=0, timestamps=True, children=True, options=None):
     mem_line_colors = ("k", "b", "r", "g", "c", "y", "m")
 
     show_trend_slope = options is not None and hasattr(options, 'slope') and options.slope is True
-
-    mem_line_label = time.strftime("%d / %m / %Y - start at %H:%M:%S",
-                                   time.localtime(global_start)) \
-                     + ".{0:03d}".format(int(round(math.modf(global_start)[0] * 1000)))
+    print(filename)
+    print(mprofile['label'])
+    print(mprofile['label'] is None)
+    mem_line_label = filename if mprofile['label'] == 'None' else mprofile['label']
+    print(mem_line_label)
 
     mem_trend = None
     if show_trend_slope:
@@ -454,8 +460,7 @@ def plot_file(filename, index=0, timestamps=True, children=True, options=None):
         # Append slope to label
         mem_line_label = mem_line_label + " slope {0:.5f}".format(mem_trend[0])
 
-    pl.plot(t, mem, "+-" + mem_line_colors[index % len(mem_line_colors)],
-            label=mem_line_label)
+    pl.plot(t, mem, "+-", label=mem_line_label)
 
     if show_trend_slope:
         # Plot the trend line
@@ -586,9 +591,7 @@ def flame_plotter(filename, index=0, timestamps=True, children=True, options=Non
 
     # cmap = pl.cm.get_cmap('gist_rainbow')
     mem_line_colors = ("k", "b", "r", "g", "c", "y", "m")
-    mem_line_label = time.strftime("%d / %m / %Y - start at %H:%M:%S",
-                                   time.localtime(global_start)) \
-                     + ".{0:03d}".format(int(round(math.modf(global_start)[0] * 1000)))
+    mem_line_label = filename
 
     pl.plot(t, mem, "-" + mem_line_colors[index % len(mem_line_colors)],
             label=mem_line_label)
