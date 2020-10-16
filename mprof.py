@@ -277,7 +277,8 @@ This file contains the process memory consumption, in Mb (one value per line).""
 
     with open(mprofile_output, "a") as f:
         f.write("CMDLINE {0}\n".format(cmd_line))
-        f.write("LABEL {0}\n".format(args.label))
+        if args.label is not None:
+            f.write("LABEL {0}\n".format(args.label))
         mp.memory_usage(proc=p, interval=args.interval, timeout=args.timeout, timestamps=True,
                         include_children=args.include_children,
                         multiprocess=args.multiprocess, stream=f)
@@ -449,7 +450,7 @@ def plot_file(filename, index=0, timestamps=True, children=True, options=None):
     print(filename)
     print(mprofile['label'])
     print(mprofile['label'] is None)
-    mem_line_label = filename if mprofile['label'] == 'None' else mprofile['label']
+    mem_line_label = filename if mprofile['label'] == None else mprofile['label']
     print(mem_line_label)
 
     mem_trend = None
