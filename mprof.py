@@ -485,7 +485,7 @@ def plot_file(filename, index=0, timestamps=True, children=True, options=None):
                 child_mem_trend_label = " slope {0:.5f}".format(cmem_trend[0])
 
             # Plot the line to the figure
-            pl.plot(cts, cmem, "+-" + mem_line_colors[(idx + 1) % len(mem_line_colors)],
+            pl.plot(cts, cmem, "-" + mem_line_colors[(idx + 1) % len(mem_line_colors)],
                     label="child {}{}".format(proc, child_mem_trend_label))
 
             if show_trend_slope:
