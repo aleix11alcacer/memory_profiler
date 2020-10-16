@@ -447,7 +447,7 @@ def plot_file(filename, index=0, timestamps=True, children=True, options=None):
     mem_line_colors = ("k", "b", "r", "g", "c", "y", "m")
 
     show_trend_slope = options is not None and hasattr(options, 'slope') and options.slope is True
-    mem_line_label = filename if mprofile['label'] == None else mprofile['label']
+    mem_line_label = filename if mprofile['label'] is None else mprofile['label']
 
     mem_trend = None
     if show_trend_slope:
@@ -457,7 +457,7 @@ def plot_file(filename, index=0, timestamps=True, children=True, options=None):
         # Append slope to label
         mem_line_label = mem_line_label + " slope {0:.5f}".format(mem_trend[0])
 
-    pl.plot(t, mem, "+-", label=mem_line_label)
+    pl.plot(t, mem, "-", label=mem_line_label)
 
     if show_trend_slope:
         # Plot the trend line
@@ -614,7 +614,7 @@ def flame_plotter(filename, index=0, timestamps=True, children=True, options=Non
             cmem = np.asarray([item[0] for item in data])
 
             # Plot the line to the figure
-            pl.plot(cts, cmem, "+-"  + mem_line_colors[(idx+1) % len(mem_line_colors)],
+            pl.plot(cts, cmem, "-"  + mem_line_colors[(idx+1) % len(mem_line_colors)],
                      label="child {}".format(proc))
 
             # Detect the maximal child memory point
