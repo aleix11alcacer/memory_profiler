@@ -447,11 +447,7 @@ def plot_file(filename, index=0, timestamps=True, children=True, options=None):
     mem_line_colors = ("k", "b", "r", "g", "c", "y", "m")
 
     show_trend_slope = options is not None and hasattr(options, 'slope') and options.slope is True
-    print(filename)
-    print(mprofile['label'])
-    print(mprofile['label'] is None)
     mem_line_label = filename if mprofile['label'] == None else mprofile['label']
-    print(mem_line_label)
 
     mem_trend = None
     if show_trend_slope:
